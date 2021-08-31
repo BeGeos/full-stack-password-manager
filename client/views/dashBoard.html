@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Password Manager</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../public/style.css" />
+  </head>
+  <body class="dashboard-page">
+    <div class="overlay"></div>
+    <div class="update-modal">
+      <div class="update-title">
+        <h3>Update</h3>
+        <span class="close-update-modal">&times;</span>
+      </div>
+      <form class="update-form">
+        <input type="text" id="update-account" name="update-account" />
+        <input type="text" id="update-name" name="update-name" />
+        <input type="password" id="update-password" name="update-password" />
+        <button type="submit">Update</button>
+      </form>
+      <div class="update-success-view">
+        <img src="../public/images/check-circle-fill.svg" alt="success check" />
+        <h3>Record Updated <br />Correctly ⭐️</h3>
+      </div>
+    </div>
+    <div class="delete-modal">
+      <div class="delete-actions">
+        <h3>Are you sure you want to delete this record?</h3>
+        <div class="delete-action-btns">
+          <button id="confirm-delete">Yes</button>
+          <button id="cancel-delete">Cancel</button>
+        </div>
+      </div>
+      <div class="delete-success-view">
+        <img
+          src="../public/images/trash-fill-delete.svg"
+          alt="delete complete icon"
+        />
+        <h3>Record was deleted successfully ⚡️</h3>
+      </div>
+    </div>
+    <header>
+      <nav class="navbar">
+        <div class="logo">
+          <img
+            src="../public/images/elephantLogo.svg"
+            alt="elephant logo walking"
+          />
+        </div>
+        <div class="logout-btn"><button id="logout-btn">Log Out</button></div>
+      </nav>
+    </header>
+    <main class="dashboard">
+      <div class="dashboard-container">
+        <div class="dashboard-title">
+          <h2>Welcome, <span class="username"><%= username %></span></h2>
+        </div>
+        <div class="error-message">
+          <div id="message"></div>
+          <span id="close-error-message">&times;</span>
+        </div>
+        <div class="dashboard-navigation">
+          <ul>
+            <li class="active" dataset="read">Read</li>
+            <li dataset="create">Create</li>
+            <li dataset="generate">Generate</li>
+          </ul>
+        </div>
+        <section id="read" class="visible">
+          <div class="upper-read-section">
+            <h3>Read</h3>
+            <input
+              type="text"
+              id="read-search-bar"
+              name="read-search-bar"
+              placeholder="Search..."
+            />
+          </div>
+          <div class="read-table">
+            <div class="table-header">
+              <h4>Account</h4>
+              <h4>Name</h4>
+              <h4>Password</h4>
+              <h4>Created</h4>
+            </div>
+            <div class="table-body">
+              <div class="table-row" id="1">
+                <p>
+                  <span class="mobile-table-row">Account</span>
+                  <span>myEmail@mail.com</span>
+                </p>
+                <p><span class="mobile-table-row">Name</span> -</p>
+                <div>
+                  <span class="mobile-table-row">Password</span>
+                  <div class="password-container">
+                    <div class="password-slot">
+                      <span class="password"></span>
+                    </div>
+                    <span class="password-clipboard">
+                      <img
+                        src="../public/images/clipboard.svg"
+                        alt="copy password to clipboard"
+                      />
+                    </span>
+                  </div>
+                </div>
+                <p><span class="mobile-table-row">Created</span> 21/02/2021</p>
+                <div class="record-btn">
+                  <button class="update-btn"></button>
+                  <button class="delete-btn"></button>
+                </div>
+              </div>
+              <div class="table-row" id="2">
+                <p><span class="mobile-table-row">Account</span> facebook</p>
+                <p><span class="mobile-table-row">Name</span> facebook</p>
+                <div>
+                  <span class="mobile-table-row">Password</span>
+                  <div class="password-container">
+                    <div class="password-slot">
+                      <span class="password"></span>
+                    </div>
+                    <span class="password-clipboard">
+                      <img
+                        src="../public/images/clipboard.svg"
+                        alt="copy password to clipboard"
+                      />
+                    </span>
+                  </div>
+                </div>
+                <p><span class="mobile-table-row">Created</span> 08/06/2016</p>
+                <div class="record-btn">
+                  <button class="update-btn"></button>
+                  <button class="delete-btn"></button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section id="create">
+          <div class="upper-create-section">
+            <h3>Create</h3>
+          </div>
+          <form class="create-form">
+            <input
+              type="text"
+              id="create-account"
+              name="create-account"
+              placeholder="Account"
+            />
+            <input
+              type="text"
+              id="create-name"
+              name="create-name"
+              placeholder="Name(optional)"
+            />
+            <input
+              type="text"
+              id="create-password"
+              name="create-password"
+              placeholder="Password"
+            />
+            <button type="submit">Create</button>
+          </form>
+        </section>
+        <section id="generate">
+          <div class="upper-generate-section">
+            <h3>Generate</h3>
+          </div>
+          <div class="generate-password">
+            <p>How many characters?</p>
+            <input
+              type="text"
+              name="password-gen-length"
+              id="password-gen-length"
+              value="24"
+            />
+          </div>
+          <div class="random-gen-password">
+            <span class="random-password"></span>
+          </div>
+          <div class="gen-btn">
+            <button id="generate-password-btn">Generate</button>
+          </div>
+        </section>
+      </div>
+    </main>
+    <script src="../public/index.js"></script>
+  </body>
+</html>
