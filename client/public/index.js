@@ -190,15 +190,19 @@ if (heroPage) {
       username,
       password,
     };
-
-    let request = await fetch(LOGIN_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(requestBody),
-    });
-    return request;
+    try {
+      let request = await fetch(LOGIN_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestBody),
+      });
+      return request;
+    } catch (err) {
+      console.error(err);
+      return;
+    }
   }
 
   loginForm.addEventListener("submit", async (e) => {
@@ -580,10 +584,15 @@ if (dashboardPage) {
       if (showState == "password") {
         // TODO put response in tmp storage Redis for id passwords
         // make Request for specific password by ID
-        let data = await getPasswordForUser(_id, USERNAME);
-        // After response put state as shown and text content as password
-        e.target.textContent = data.password;
-        e.target.classList.add("show");
+        try {
+          let data = await getPasswordForUser(_id, USERNAME);
+          // After response put state as shown and text content as password
+          e.target.textContent = data.password;
+          e.target.classList.add("show");
+        } catch (err) {
+          console.error(err);
+          return;
+        }
       } else if (showState == "password show") {
         // Set text content as ********* and set state as hidden
         e.target.textContent = "********";
@@ -601,10 +610,15 @@ if (dashboardPage) {
       let _id = e.target.closest("div .table-row").id;
       updateModal.setAttribute("dataset", _id);
       // Request to API via ID + userID
-      let data = await requestPassById(_id, USERNAME);
-      let account = data.passwords.account;
-      let name = data.passwords.name;
-      setValuesToUpdate(account, name);
+      try {
+        let data = await requestPassById(_id, USERNAME);
+        let account = data.passwords.account;
+        let name = data.passwords.name;
+        setValuesToUpdate(account, name);
+      } catch (err) {
+        console.error(err);
+        return;
+      }
     } else if (
       // Event for open delete confirmation modal when clicking update button
       e.target.matches("button") &&
@@ -667,7 +681,7 @@ if (dashboardPage) {
       if (request.status == 201) {
         // if status code == 200 --> hide form, display success view and wait 1s to close modal
         successUpdate();
-        let data = await listAllRecords(USERNAME);
+        await listAllRecords(USERNAME);
       } else {
         let response = await request.json();
         closeUpdateModal();
