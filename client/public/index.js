@@ -1,3 +1,8 @@
+// TODO
+// [] Tmp DB for user data when loading page. Set under id == userId and use info for
+// [] Tmp DB for shown passwords. Use Redis Store. Read only!
+// [] Search functionalities for input
+
 // Global variables
 const BASE_URL = "http://localhost:3000";
 const API_URL = "http://localhost:3000/api/v1/";
@@ -240,6 +245,10 @@ if (dashboardPage) {
     ".dashboard-navigation [dataset]"
   );
 
+  // Global variables
+  let USERNAME = parseUserFromURL();
+
+  // Helper functions
   // Hide section if not visible
   function hideSection(section) {
     section.classList.remove("visible");
@@ -323,11 +332,27 @@ if (dashboardPage) {
   });
 
   // Event for confirm delete button
-  confirmDeleteBtn.addEventListener("click", (e) => {
+  confirmDeleteBtn.addEventListener("click", async (e) => {
     let _id = e.target.closest(".delete-modal").getAttribute("dataset");
-    console.log(_id);
+    // console.log(_id);
     // Send request to API to delete record. In body userId and password id == _id
-    showSuccessDeleteView();
+    try {
+      let request = await fetch(API_URL + `delete/${USERNAME}?id=${_id}`, {
+        method: "DELETE",
+      });
+      if (request.status == 200) {
+        showSuccessDeleteView();
+        listAllRecords(USERNAME);
+      } else {
+        // Display error message
+        let response = await request.json();
+        console.error(response.message);
+        return;
+      }
+    } catch (err) {
+      console.error(err);
+      return;
+    }
   });
 
   // Success View when record is deleted
@@ -341,56 +366,244 @@ if (dashboardPage) {
   function setValuesToUpdate(account, name) {
     accountInput.value = account;
     nameInput.value = name;
-    newPasswordInput.value = "*****";
+    newPasswordInput.value = "********";
   }
 
-  // Test DB for user record information --> test update modal form
-  const DB = [
-    {
-      id: 1,
-      account: "bank account",
-      name: "-",
-      password: "chimichanga",
-    },
-    {
-      id: 2,
-      account: "facebook",
-      name: "facebook",
-      password: "deadpool00",
-    },
-  ];
+  // Parse window path
+  function parseUserFromURL() {
+    let path = window.location.pathname;
+    let splitURL = path.split("/");
+    let user = splitURL[splitURL.length - 1];
+    return user;
+  }
+
+  // Request for all records when page loads
+  // Store in tmp DB (Redis) first response under id == user_id
+  async function listAllRecords(username) {
+    try {
+      let request = await fetch(API_URL + `account/${username}`);
+      if (request.status == 200) {
+        let response = await request.json();
+        // console.log(response.passwords);
+        putRecordsOnPage(response);
+      } else {
+        console.error(request.error);
+        return;
+      }
+    } catch (err) {
+      console.error(err);
+      return;
+    }
+  }
+
+  // Request passwords for users
+  async function requestPassById(id, username) {
+    try {
+      let request = await fetch(API_URL + `account/${username}?pass=${id}`);
+      let response = await request.json();
+      return response;
+    } catch (err) {
+      console.error(err);
+      return;
+    }
+  }
+
+  async function requestPassByAccount(account, username) {
+    try {
+      let request = await fetch(
+        API_URL + `account/${username}?account=${account}`
+      );
+      let response = await request.json();
+      return response;
+    } catch (err) {
+      console.error(err);
+      return;
+    }
+  }
+
+  // Date format for humans
+  function formatDate(date) {
+    let source = new Date(date);
+    let day = source.getDate();
+    let month = source.getMonth() + 1;
+    let year = source.getFullYear();
+
+    return `${day}/${month}/${year}`;
+  }
+
+  // Input event for search bar
+  const searchBar = document.getElementById("read-search-bar");
+
+  searchBar.addEventListener("input", async (e) => {
+    // Check in tmp storage Redis Store then make request in case
+    if (searchBar.value.length % 3 == 0) {
+      // Send request and put data into table every 3 characters
+      try {
+        let matches = await requestPassByAccount(searchBar.value, USERNAME);
+        putRecordsOnPage(matches);
+      } catch (err) {
+        console.error(err);
+        return;
+      }
+    }
+  });
+
+  // Select the table body
+  const tableBody = document.querySelector(".table-body");
+
+  // Put data in table
+  function putRecordsOnPage(data) {
+    // Clear Div
+    tableBody.innerHTML = "";
+
+    if (data.passwords.length == 0) {
+      let noRecordMsg = document.createElement("h3");
+      noRecordMsg.textContent = "No Record Here!";
+      tableBody.appendChild(noRecordMsg);
+      return;
+    } else {
+      // Create a single row + id of password
+      let passwords = data.passwords;
+      passwords.forEach((pass) => {
+        // Format the date
+        let correctDate = formatDate(pass.createdAt);
+
+        // Create Row
+        let tableRow = document.createElement("div");
+        tableRow.classList.add("table-row");
+        tableRow.setAttribute("id", pass._id);
+
+        // Create account column
+        let accountP = document.createElement("p");
+        let mobileAccountSpan = document.createElement("span");
+        let accountText = document.createElement("span");
+        mobileAccountSpan.classList.add("mobile-table-row");
+        mobileAccountSpan.textContent = "Account";
+        accountText.textContent = pass.account;
+        accountP.appendChild(mobileAccountSpan);
+        accountP.appendChild(accountText);
+        tableRow.appendChild(accountP);
+
+        // Create name column
+        let nameP = document.createElement("p");
+        let mobileNameSpan = document.createElement("span");
+        let nameText = document.createElement("span");
+        mobileNameSpan.classList.add("mobile-table-row");
+        mobileNameSpan.textContent = "Name";
+        nameText.textContent = pass.name;
+        nameP.appendChild(mobileNameSpan);
+        nameP.appendChild(nameText);
+        tableRow.appendChild(nameP);
+
+        // Create password column
+        let passwordDiv = document.createElement("div");
+        let passMobileSpan = document.createElement("span");
+        let passContainer = document.createElement("div");
+        passContainer.classList.add("password-container");
+        let passSlot = document.createElement("div");
+        passSlot.classList.add("password-slot");
+        let passSpan = document.createElement("span");
+        passSpan.classList.add("password");
+        passSpan.textContent = "********";
+        let clipboard = document.createElement("span");
+        clipboard.classList.add("password-clipboard");
+        let clipboardImg = document.createElement("img");
+        clipboardImg.src = "../public/images/clipboard.svg";
+        clipboardImg.alt = "copy password to clipboard";
+        clipboard.appendChild(clipboardImg);
+        passSlot.appendChild(passSpan);
+        passContainer.appendChild(passSlot);
+        passContainer.appendChild(clipboard);
+        passwordDiv.appendChild(passMobileSpan);
+        passwordDiv.appendChild(passContainer);
+        tableRow.appendChild(passwordDiv);
+
+        // Create date column
+        let dateP = document.createElement("p");
+        let dateMobileSpan = document.createElement("span");
+        dateMobileSpan.classList.add("mobile-table-row");
+        dateMobileSpan.textContent = "Created";
+        let dateText = document.createElement("span");
+        dateText.textContent = correctDate;
+        dateP.appendChild(dateMobileSpan);
+        dateP.appendChild(dateText);
+        tableRow.appendChild(dateP);
+
+        // Create Action Buttons
+        let buttonContainer = document.createElement("div");
+        buttonContainer.classList.add("record-btn");
+        let updateButton = document.createElement("button");
+        updateButton.classList.add("update-btn");
+        let deleteButton = document.createElement("button");
+        deleteButton.classList.add("delete-btn");
+        buttonContainer.appendChild(updateButton);
+        buttonContainer.appendChild(deleteButton);
+        tableRow.appendChild(buttonContainer);
+
+        // Append row to Table Body
+        tableBody.appendChild(tableRow);
+      });
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", async () => {
+    // TODO show spinning gif when loading then data
+    await listAllRecords(USERNAME);
+  });
+
+  // request password for single user
+  async function getPasswordForUser(id, username) {
+    try {
+      let request = await fetch(API_URL + `read/${username}?id=${id}`);
+      let response = await request.json();
+      return response;
+    } catch (err) {
+      console.error(err);
+      return;
+    }
+  }
+
+  // TODO Put in tmp database all records for user for update form better than keep requesting
 
   // Add event listener to document because elements are loaded async
-  document.addEventListener("click", (e) => {
+  document.addEventListener("click", async (e) => {
     // Event for showing password clicking spans
     if (
       e.target.matches("span") &&
-      e.target.getAttribute("class") == "password"
+      (e.target.getAttribute("class") == "password" ||
+        e.target.getAttribute("class") == "password show")
     ) {
-      e.target.classList.add("show");
-      e.target.closest("div").classList.add("open");
-    } else if (
-      e.target.matches("span") &&
-      e.target.getAttribute("class") == "password show"
-    ) {
-      e.target.classList.remove("show");
-      e.target.closest("div").classList.remove("open");
+      // Check if show
+      let showState = e.target.getAttribute("class");
+      let _id = e.target.closest("div .table-row").id;
+
+      if (showState == "password") {
+        // TODO put response in tmp storage Redis for id passwords
+        // make Request for specific password by ID
+        let data = await getPasswordForUser(_id, USERNAME);
+        // After response put state as shown and text content as password
+        e.target.textContent = data.password;
+        e.target.classList.add("show");
+      } else if (showState == "password show") {
+        // Set text content as ********* and set state as hidden
+        e.target.textContent = "********";
+        e.target.classList.remove("show");
+      }
+      e.target.closest("div").classList.toggle("open");
     } else if (
       // Event for open update modal when clicking update button
       e.target.matches("button") &&
       e.target.getAttribute("class") == "update-btn"
     ) {
-      overlay.classList.add("open");
-      updateModal.classList.add("show");
+      overlay.classList.toggle("open");
+      updateModal.classList.toggle("show");
       updateForm.style.display = "flex";
       let _id = e.target.closest("div .table-row").id;
       updateModal.setAttribute("dataset", _id);
       // Request to API via ID + userID
-      // Response with account, name, password
-      // Test request to fake DB
-      let data = DB.filter((record) => record.id == _id)[0];
-      let account = data.account;
-      let name = data.name;
+      let data = await requestPassById(_id, USERNAME);
+      let account = data.passwords.account;
+      let name = data.passwords.name;
       setValuesToUpdate(account, name);
     } else if (
       // Event for open delete confirmation modal when clicking update button
@@ -406,8 +619,21 @@ if (dashboardPage) {
   });
 
   // Send update request to API
-  function sendUpdate() {
-    // Send object to API with {userId, recordId, account, name, password and date}
+  async function sendUpdate(id, payload) {
+    // Sent PUT request to API for updating records
+    try {
+      let request = await fetch(API_URL + `update/${USERNAME}?id=${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+      return request;
+    } catch (err) {
+      console.error(err);
+      return;
+    }
   }
 
   // Success view when update is sent
@@ -418,7 +644,7 @@ if (dashboardPage) {
   }
 
   // Event listener to the update form
-  updateForm.addEventListener("submit", (e) => {
+  updateForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     let recordId = e.target.closest("div").getAttribute("dataset");
     let updateFormData = new FormData(updateForm);
@@ -426,19 +652,74 @@ if (dashboardPage) {
     let newName = updateFormData.get("update-name");
     let newPassword = updateFormData.get("update-password");
 
-    // Sent PUT request to API for updating records
-    // fetch ....
+    let updateRequest = {
+      account: newAccount,
+      name: newName,
+    };
 
-    // if status code == 200 --> hide form, display success view and wait 1s to close modal
-    successUpdate();
+    if (!newPassword.match(/\*+/)) {
+      updateRequest.password = newPassword;
+    }
+    try {
+      // Send request
+      let request = await sendUpdate(recordId, updateRequest);
+
+      if (request.status == 201) {
+        // if status code == 200 --> hide form, display success view and wait 1s to close modal
+        successUpdate();
+        let data = await listAllRecords(USERNAME);
+      } else {
+        let response = await request.json();
+        closeUpdateModal();
+        composeErrorMessage(response.message);
+        displayErrorMessage();
+        console.error(response.message);
+        return;
+      }
+    } catch (err) {
+      composeErrorMessage(err);
+      displayErrorMessage();
+      return;
+    }
   });
 
   // Event listener for create record form
   const createRecordForm = document.querySelector(".create-form");
 
-  createRecordForm.addEventListener("submit", (e) => {
+  createRecordForm.addEventListener("submit", async (e) => {
     e.preventDefault();
-    console.log("record created!");
+    // Send POST request to /create/:username with account, password required and name not required
+    let formData = new FormData(createRecordForm);
+    let payload = {
+      account: formData.get("create-account"),
+      password: formData.get("create-password"),
+      name: formData.get("create-name") || "-",
+    };
+
+    try {
+      let request = await fetch(API_URL + `create/${USERNAME}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (request.status == 201) {
+        window.location = `/user/${USERNAME}`;
+      } else {
+        let response = await request.json();
+        composeErrorMessage(response.message);
+        displayErrorMessage();
+        console.error(response.message);
+        return;
+      }
+    } catch (err) {
+      composeErrorMessage(response.message);
+      displayErrorMessage();
+      console.error(err);
+      return;
+    }
   });
 
   // Generate random password
