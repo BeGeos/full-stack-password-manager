@@ -21,9 +21,14 @@
         <span class="close-update-modal">&times;</span>
       </div>
       <form class="update-form">
-        <input type="text" id="update-account" name="update-account" />
+        <input type="text" id="update-account" name="update-account" required />
         <input type="text" id="update-name" name="update-name" />
-        <input type="password" id="update-password" name="update-password" />
+        <input
+          type="password"
+          id="update-password"
+          name="update-password"
+          required
+        />
         <button type="submit">Update</button>
       </form>
       <div class="update-success-view">
@@ -63,7 +68,7 @@
         <div class="dashboard-title">
           <h2>Welcome, <span class="username"><%= username %></span></h2>
         </div>
-        <div class="error-message">
+        <div class="error-message wide">
           <div id="message"></div>
           <span id="close-error-message">&times;</span>
         </div>
@@ -91,57 +96,7 @@
               <h4>Password</h4>
               <h4>Created</h4>
             </div>
-            <div class="table-body">
-              <div class="table-row" id="1">
-                <p>
-                  <span class="mobile-table-row">Account</span>
-                  <span>myEmail@mail.com</span>
-                </p>
-                <p><span class="mobile-table-row">Name</span> -</p>
-                <div>
-                  <span class="mobile-table-row">Password</span>
-                  <div class="password-container">
-                    <div class="password-slot">
-                      <span class="password"></span>
-                    </div>
-                    <span class="password-clipboard">
-                      <img
-                        src="../public/images/clipboard.svg"
-                        alt="copy password to clipboard"
-                      />
-                    </span>
-                  </div>
-                </div>
-                <p><span class="mobile-table-row">Created</span> 21/02/2021</p>
-                <div class="record-btn">
-                  <button class="update-btn"></button>
-                  <button class="delete-btn"></button>
-                </div>
-              </div>
-              <div class="table-row" id="2">
-                <p><span class="mobile-table-row">Account</span> facebook</p>
-                <p><span class="mobile-table-row">Name</span> facebook</p>
-                <div>
-                  <span class="mobile-table-row">Password</span>
-                  <div class="password-container">
-                    <div class="password-slot">
-                      <span class="password"></span>
-                    </div>
-                    <span class="password-clipboard">
-                      <img
-                        src="../public/images/clipboard.svg"
-                        alt="copy password to clipboard"
-                      />
-                    </span>
-                  </div>
-                </div>
-                <p><span class="mobile-table-row">Created</span> 08/06/2016</p>
-                <div class="record-btn">
-                  <button class="update-btn"></button>
-                  <button class="delete-btn"></button>
-                </div>
-              </div>
-            </div>
+            <div class="table-body"></div>
           </div>
         </section>
         <section id="create">
@@ -154,6 +109,7 @@
               id="create-account"
               name="create-account"
               placeholder="Account"
+              required
             />
             <input
               type="text"
@@ -162,10 +118,11 @@
               placeholder="Name(optional)"
             />
             <input
-              type="text"
+              type="password"
               id="create-password"
               name="create-password"
               placeholder="Password"
+              required
             />
             <button type="submit">Create</button>
           </form>
