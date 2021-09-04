@@ -60,7 +60,84 @@
             alt="elephant logo walking"
           />
         </div>
-        <div class="logout-btn"><button id="logout-btn">Log Out</button></div>
+        <div class="action-nav">
+          <div class="actions-container">
+            <div class="user-nav-list show">
+              <ul>
+                <li><strong>Username</strong> Username</li>
+                <li><strong>Active</strong> Yes</li>
+                <li><strong>Created On</strong> 3/9/2021</li>
+              </ul>
+              <button id="open-update-user">Update</button>
+              <small
+                >Delete Account?<img
+                  src="../public/images/trash-fill-delete.svg"
+                  alt="delete account link"
+                  id="delete-account-trashcan"
+              /></small>
+            </div>
+            <div class="update-user__form">
+              <div class="go-back-to-info right">
+                <img
+                  src="../public/images/arrow-right.svg"
+                  alt="go back to user info"
+                />
+              </div>
+              <form id="update-user">
+                <input
+                  type="text"
+                  id="update-user-username"
+                  name="update-user-username"
+                  required
+                  value="Username"
+                />
+                <input
+                  type="email"
+                  id="update-user-email"
+                  name="update-user-email"
+                  required
+                  value="email@mail.com"
+                />
+                <input
+                  type="password"
+                  id="update-user-password"
+                  name="update-user-password"
+                  required
+                  value="*********"
+                />
+                <button>Update</button>
+              </form>
+            </div>
+            <div class="confirm-user-delete">
+              <div class="go-back-to-info left">
+                <img
+                  src="../public/images/arrow-left.svg"
+                  alt="go back to user info"
+                />
+              </div>
+              <h4>Are You Sure you want to delete this Account?</h4>
+              <img
+                src="../public/images/exclamation-triangle-fill.svg"
+                alt="warning for deletion"
+              />
+              <p>
+                Deleting this account is irreversible and will get rid of all
+                the data saved, comprised the passwords. You might want to have
+                them stored somewhere else before proceeding. If you have
+                already done that, it's sad to see you go 😥
+              </p>
+              <button id="delete-account-btn" dataset="username">
+                Delete Account
+              </button>
+            </div>
+          </div>
+          <img
+            id="open-user-info-btn"
+            src="../public/images/person-circle.svg"
+            alt="user actions"
+          />
+          <button id="logout-btn">Log Out</button>
+        </div>
       </nav>
     </header>
     <main class="dashboard">

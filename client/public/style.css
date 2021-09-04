@@ -130,6 +130,143 @@ header {
   background-color: var(--clr-action-hover);
 }
 
+.action-nav {
+  position: relative;
+  display: flex;
+  gap: 1.25rem;
+}
+
+.action-nav img {
+  cursor: pointer;
+}
+
+.actions-container {
+  display: none;
+  pointer-events: none;
+  position: absolute;
+  background-color: var(--clr-hero-text);
+  padding: 1.25rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+  top: 120%;
+  right: 40%;
+  z-index: 10;
+}
+
+.actions-container.open {
+  display: block;
+  width: max-content;
+  height: max-content;
+}
+
+.actions-container.open::before {
+  content: "";
+  position: absolute;
+  top: -4%;
+  left: calc(100% - 7.95rem);
+  width: 0;
+  height: 0;
+  z-index: 5;
+  border-left: 1rem solid transparent;
+  border-right: 1rem solid transparent;
+  border-bottom: 1rem solid white;
+}
+
+.user-nav-list,
+.update-user__form,
+.confirm-user-delete {
+  display: none;
+  pointer-events: none;
+}
+
+.user-nav-list.show,
+.update-user__form.show {
+  pointer-events: all;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  gap: 1.25rem;
+}
+
+.user-nav-list ul {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.user-nav-list small {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+#delete-account-trashcan {
+  height: 1.5rem;
+}
+
+.update-user__form form {
+  min-width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.update-user__form input {
+  min-height: 3.125rem;
+  min-width: 30ch;
+  border: none;
+  border-radius: var(--pill-btn);
+  background-color: var(--clr-grey);
+  font-family: inherit;
+  outline: none;
+  padding: 0 1.875rem;
+}
+
+.update-user__form input:focus-within {
+  background-color: var(--clr-accented-grey);
+}
+
+.go-back-to-info.right {
+  text-align: right;
+  opacity: 0.4;
+}
+
+.go-back-to-info.left {
+  text-align: left;
+  opacity: 0.4;
+}
+
+.go-back-to-info:hover {
+  opacity: 1;
+}
+
+.confirm-user-delete.show {
+  display: block;
+  pointer-events: all;
+  max-width: 30ch;
+  text-align: center;
+}
+
+.confirm-user-delete img:nth-child(3) {
+  margin: 1em auto;
+}
+
+.confirm-user-delete p {
+  text-align: left;
+  line-height: 1.3;
+  opacity: 0.6;
+  font-size: 0.8rem;
+  margin-bottom: 1em;
+}
+
+#delete-account-btn {
+  background-color: var(--clr-danger);
+}
+
+#delete-account-btn:hover {
+  background-color: var(--clr-danger-hover);
+}
+
 /* Hero section */
 .hero-section {
   flex: 1;

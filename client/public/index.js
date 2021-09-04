@@ -252,6 +252,55 @@ if (dashboardPage) {
   // Global variables
   let USERNAME = parseUserFromURL();
 
+  // User actions
+  const openUserInfoBtn = document.getElementById("open-user-info-btn");
+  const actionsContainer = document.querySelector(".actions-container");
+  const openUpdateUserBtn = document.getElementById("open-update-user");
+  const userInfo = document.querySelector(".user-nav-list");
+  const updateUserInfo = document.querySelector(".update-user__form");
+  const updateUserInfoForm = document.getElementById("update-user");
+  const openDeleteUserBtn = document.getElementById("delete-account-trashcan");
+  const deleteUser = document.querySelector(".confirm-user-delete");
+  const deleteUserBtn = document.getElementById("delete-account-btn");
+  const goBackToUserInfo = document.querySelectorAll(".go-back-to-info");
+
+  openUserInfoBtn.addEventListener("click", (e) => {
+    actionsContainer.classList.toggle("open");
+  });
+
+  openUpdateUserBtn.addEventListener("click", (e) => {
+    userInfo.classList.remove("show");
+    updateUserInfo.classList.add("show");
+  });
+
+  updateUserInfoForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    // Send info to API and display response if error else back to info
+    console.log("Sent!");
+  });
+
+  // Go back to user info
+  function goBackToInfo(target) {
+    target.closest(".show").classList.remove("show");
+    userInfo.classList.add("show");
+  }
+
+  goBackToUserInfo.forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      goBackToInfo(e.target);
+    });
+  });
+
+  openDeleteUserBtn.addEventListener("click", (e) => {
+    deleteUser.classList.add("show");
+    userInfo.classList.remove("show");
+  });
+
+  deleteUserBtn.addEventListener("click", (e) => {
+    // Send request to delete user and after confirm logout user
+    console.log("Deleted!");
+  });
+
   // Helper functions
   // Hide section if not visible
   function hideSection(section) {
@@ -552,7 +601,7 @@ if (dashboardPage) {
 
   document.addEventListener("DOMContentLoaded", async () => {
     // TODO show spinning gif when loading then data
-    await listAllRecords(USERNAME);
+    // await listAllRecords(USERNAME);
   });
 
   // request password for single user
