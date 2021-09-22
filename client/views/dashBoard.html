@@ -64,9 +64,13 @@
           <div class="actions-container">
             <div class="user-nav-list show">
               <ul>
-                <li><strong>Username</strong> Username</li>
-                <li><strong>Active</strong> Yes</li>
-                <li><strong>Created On</strong> 3/9/2021</li>
+                <li>
+                  <strong>Username</strong> <span id="user-username"></span>
+                </li>
+                <li><strong>Active</strong> <span id="user-active"></span></li>
+                <li>
+                  <strong>Created On</strong> <span id="user-created-on"></span>
+                </li>
               </ul>
               <button id="open-update-user">Update</button>
               <small
@@ -77,11 +81,14 @@
               /></small>
             </div>
             <div class="update-user__form">
-              <div class="go-back-to-info right">
-                <img
-                  src="../public/images/arrow-right.svg"
-                  alt="go back to user info"
-                />
+              <div class="update-user-header">
+                <div id="update-user-error">Error</div>
+                <div class="go-back-to-info right">
+                  <img
+                    src="../public/images/arrow-right.svg"
+                    alt="go back to user info"
+                  />
+                </div>
               </div>
               <form id="update-user">
                 <input
@@ -89,14 +96,12 @@
                   id="update-user-username"
                   name="update-user-username"
                   required
-                  value="Username"
                 />
                 <input
                   type="email"
                   id="update-user-email"
                   name="update-user-email"
                   required
-                  value="email@mail.com"
                 />
                 <input
                   type="password"
@@ -126,9 +131,7 @@
                 them stored somewhere else before proceeding. If you have
                 already done that, it's sad to see you go 😥
               </p>
-              <button id="delete-account-btn" dataset="username">
-                Delete Account
-              </button>
+              <button id="delete-account-btn">Delete Account</button>
             </div>
           </div>
           <img
@@ -143,7 +146,10 @@
     <main class="dashboard">
       <div class="dashboard-container">
         <div class="dashboard-title">
-          <h2>Welcome, <span class="username"><%= username %></span></h2>
+          <h2>
+            Welcome,
+            <span class="username" id="header-username"><%= username %></span>
+          </h2>
         </div>
         <div class="error-message wide">
           <div id="message"></div>

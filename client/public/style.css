@@ -194,6 +194,12 @@ header {
   gap: 1.25rem;
 }
 
+.user-nav-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 5px;
+}
+
 .user-nav-list small {
   display: flex;
   align-items: center;
@@ -202,6 +208,27 @@ header {
 
 #delete-account-trashcan {
   height: 1.5rem;
+}
+
+.update-user-header {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+#update-user-error {
+  display: none;
+  flex: 1;
+  font-weight: 700;
+  padding: 1em;
+  border-radius: 1rem;
+  background-color: var(--clr-danger);
+  color: var(--clr-hero-text);
+}
+
+#update-user-error.visible {
+  display: block;
 }
 
 .update-user__form form {
@@ -261,6 +288,8 @@ header {
 
 #delete-account-btn {
   background-color: var(--clr-danger);
+  padding: 1em 1.75em;
+  max-height: none;
 }
 
 #delete-account-btn:hover {

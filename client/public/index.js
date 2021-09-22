@@ -250,7 +250,7 @@ if (dashboardPage) {
   );
 
   // Global variables
-  let USERNAME = parseUserFromURL();
+  const USERNAME = parseUserFromURL();
 
   // User actions
   const openUserInfoBtn = document.getElementById("open-user-info-btn");
@@ -258,10 +258,8 @@ if (dashboardPage) {
   const openUpdateUserBtn = document.getElementById("open-update-user");
   const userInfo = document.querySelector(".user-nav-list");
   const updateUserInfo = document.querySelector(".update-user__form");
-  const updateUserInfoForm = document.getElementById("update-user");
   const openDeleteUserBtn = document.getElementById("delete-account-trashcan");
   const deleteUser = document.querySelector(".confirm-user-delete");
-  const deleteUserBtn = document.getElementById("delete-account-btn");
   const goBackToUserInfo = document.querySelectorAll(".go-back-to-info");
 
   openUserInfoBtn.addEventListener("click", (e) => {
@@ -271,12 +269,6 @@ if (dashboardPage) {
   openUpdateUserBtn.addEventListener("click", (e) => {
     userInfo.classList.remove("show");
     updateUserInfo.classList.add("show");
-  });
-
-  updateUserInfoForm.addEventListener("submit", (e) => {
-    e.preventDefault();
-    // Send info to API and display response if error else back to info
-    console.log("Sent!");
   });
 
   // Go back to user info
@@ -294,11 +286,6 @@ if (dashboardPage) {
   openDeleteUserBtn.addEventListener("click", (e) => {
     deleteUser.classList.add("show");
     userInfo.classList.remove("show");
-  });
-
-  deleteUserBtn.addEventListener("click", (e) => {
-    // Send request to delete user and after confirm logout user
-    console.log("Deleted!");
   });
 
   // Helper functions
@@ -430,6 +417,83 @@ if (dashboardPage) {
     return user;
   }
 
+  // Show error message in update user form
+  function popupErrorMessage(message) {
+    let updateErrorMessage = document.getElementById("update-user-error");
+    updateErrorMessage.classList.add("visible");
+    updateErrorMessage.textContent = message;
+  }
+
+  // Manage User options
+  function setUserData(data) {
+    const username = data.user.username;
+    const isActive = data.user.isActive ? "Yes" : "No";
+    const createdAt = formatDate(data.user.createdAt);
+    const email = data.user.email;
+
+    // Display user info
+    document.getElementById("user-username").textContent = username;
+    document.getElementById("user-active").textContent = isActive;
+    document.getElementById("user-created-on").textContent = createdAt;
+    document.getElementById("header-username").textContent = username;
+
+    // User data in update Form
+    const updateUserForm = document.getElementById("update-user");
+    document.getElementById("update-user-username").value = username;
+    document.getElementById("update-user-email").value = email;
+    document.getElementById("update-user-password").value = "********";
+
+    // Add event to update user form
+    updateUserForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      // Request user Update PUT API_URL + account/:username/update
+      let formData = new FormData(updateUserForm);
+
+      let payload = {
+        username: formData.get("update-user-username"),
+        email: formData.get("update-user-email"),
+      };
+
+      !formData.get("update-user-password").match(/\*+/)
+        ? (payload.password = formData.get("update-user-password"))
+        : null;
+
+      try {
+        let request = await fetch(API_URL + `account/${username}/update`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        });
+
+        if (request.status == 200) {
+          // Refresh the page with new info
+          window.location = `/user/${formData.get("update-user-username")}`;
+        } else {
+          let response = await request.json();
+          console.error(response.message);
+          popupErrorMessage(response.message);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    });
+
+    // Delete account
+    const deleteAccountBtn = document.getElementById("delete-account-btn");
+
+    deleteAccountBtn.addEventListener("click", async (e) => {
+      // Send delete request DELETE api/v1/account/:username/delete
+      await fetch(API_URL + `account/${username}/delete`, {
+        method: "DELETE",
+      });
+      // Call Logout
+      await fetch(AUTH_URL + "logout");
+      window.location = "/";
+    });
+  }
+
   // Request for all records when page loads
   // Store in tmp DB (Redis) first response under id == user_id
   async function listAllRecords(username) {
@@ -438,6 +502,7 @@ if (dashboardPage) {
       if (request.status == 200) {
         let response = await request.json();
         // console.log(response.passwords);
+        setUserData(response);
         putRecordsOnPage(response);
       } else {
         console.error(request.error);
@@ -601,7 +666,7 @@ if (dashboardPage) {
 
   document.addEventListener("DOMContentLoaded", async () => {
     // TODO show spinning gif when loading then data
-    // await listAllRecords(USERNAME);
+    await listAllRecords(USERNAME);
   });
 
   // request password for single user
